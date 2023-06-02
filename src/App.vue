@@ -1,35 +1,49 @@
 <template>
-  <div>
-    <b-table striped hover :items="items" :fields="fields"></b-table>
+  <div class="app">
+    <DataTable :items="users" :headers="headers" @updateValue="updateValue"/>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { BTable } from 'bootstrap-vue';
+import DataTable from '@/components/DataTable.vue'
+import { useUsersStore } from '@/store/users'
 
-const items = ref([
-  { isActive: true, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-  { isActive: false, age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-  { isActive: false, age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-  { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' }
-]);
+const usersStore = useUsersStore()
 
-const fields = ref([
+const users = usersStore.users
+
+function updateValue(newValue: any) {
+  console.log(newValue)
+}
+
+const headers = ref([
   {
-    key: 'last_name',
-    sortable: true
-  },
-  {
-    key: 'first_name',
-    sortable: false
-  },
-  {
-    key: 'age',
-    label: 'Person age',
+    label: 'Nombre',
+    key: 'name',
     sortable: true,
-    variant: 'danger'
-  }
+    editable: true,
+  },
+  {
+    label: 'Fecha',
+    key: 'date',
+    sortable: true,
+    editable: false,
+  },
+  {
+    label: 'Estado',
+    key: 'status',
+    sortable: true,
+    editable: false,
+  },
 ]);
 </script>
 
+<style lang="scss">
+// @import "@/styles/variables.scss";
+
+// .app {
+//   // background-color: $primary-color;
+//   // color: $secondary-color;
+// }
+</style>
