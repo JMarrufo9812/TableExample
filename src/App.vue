@@ -1,23 +1,33 @@
 <template>
   <div class="app">
-    <DataTable :items="users" :headers="headers" @updateValue="updateValue"/>
+    <DataTable 
+      :items="usersStore.users" 
+      :headers="headers" 
+      @updateValue="updateValue"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref,  onMounted } from 'vue';
 import DataTable from '@/components/DataTable.vue'
 import { useUsersStore } from '@/store/users'
+import { generateUsers  } from '@/utils'
+import { User, UpdateUserValue } from '@/entities/user.ts'
+
 
 const usersStore = useUsersStore()
 
-const users = usersStore.users
-
-function updateValue(newValue: any) {
-  console.log(newValue)
+function updateValue(updateInfo: UpdateUserValue) {
+  usersStore.updateValue(updateInfo)
 }
 
 const headers = ref([
+  { 
+    label: '',
+    key: 'selected',
+    class: 'align-center',
+  },
   {
     label: 'Nombre',
     key: 'name',
@@ -37,6 +47,12 @@ const headers = ref([
     editable: false,
   },
 ]);
+
+onMounted(() => {
+  generateUsers(10).forEach((user: User) => {
+    usersStore.create(user)
+  })
+});
 </script>
 
 <style lang="scss">

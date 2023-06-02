@@ -8,23 +8,36 @@
     :per-page="perPage"
     :current-page="currentPage"
     @filtered="resetPagination"
+    selectable
+    @row-selected="itemSelected"
+    hover
   >
-    <template #table-caption>This is a table caption.</template>
-    <template #cell()="data">
-      <!-- <pre>{{ data }}</pre> -->
-      <p 
-        v-if="!data.item[`edit${data.field.key}`]" 
-        @click="toggleEditable(data)"
-      >
-        {{ data.item[data.field.key] }}
-      </p>
-      <b-form-input 
-        v-else 
-        type="text" 
-        v-model="data.item[data.field.key]" 
-        @keyup.enter="saveValue(data)" 
-      />
-    </template>
+  <template #cell(selected)="{ rowSelected, selectRow, unselectRow }">
+    <b-form-checkbox 
+      :checked="rowSelected" 
+      @change="rowSelected ? unselectRow() : selectRow()" 
+      size="lg"
+      class="text-center"
+    />
+  </template>
+  <template #cell()="data">
+    <p 
+      v-if="!data.item[`edit${data.field.key}`]" 
+      @click="toggleEditable(data)"
+      class="text-center"
+    >
+      {{ data.item[data.field.key] }}
+    </p>
+    <b-form-input 
+      v-else 
+      type="text" 
+      v-model="data.item[data.field.key]" 
+      @keyup.enter="saveValue(data)" 
+    />
+  </template>
+  <template #table-caption>
+    <pre v-if="itemsSelected && itemsSelected.length">{{ itemsSelected }}</pre>
+  </template>
   </b-table>
   <b-pagination
     v-model="currentPage"
@@ -37,7 +50,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, defineEmits } from 'vue';
-import { BTable, BPagination, BFormInput } from 'bootstrap-vue';
+import { BTable, BPagination, BFormInput, BFormCheckbox } from 'bootstrap-vue';
 import { Header } from '@/entities/header'
 
 const props = defineProps<{
@@ -45,10 +58,10 @@ const props = defineProps<{
   headers: Header[];
 }>();
 
-const emits = defineEmits(['updateValue']);
+const emits = defineEmits(['updateValue', 'itemSelected']);
 
 const items = ref(props.items);
-let headers = ref(props.headers.map(item => Object.assign({}, item, { editable: false })));
+const headers = ref(props.headers);
 
 // sorteable functions
 
@@ -88,24 +101,33 @@ const resetPagination = () => {
 watch([currentPage, perPage], resetPagination);
 
 // editable functions
+
 const toggleEditable = (data: any) => {
-  const editableKey = `edit${data.field.key}`;
-  data.item[editableKey] = !data.item[editableKey];
+  if (data.field.editable) {
+    const editableKey = `edit${data.field.key}`;
+    data.item[editableKey] = !data.item[editableKey];
+  }
 };
-// // // Obtiene el tipo de input según el tipo de campo
-// const getInputType = (field: Header): string => {
-//   // if (field.type === 'number') {
-//   //   return 'number';
-//   // }
-//   return 'text';
-// };
 
 const saveValue = (data: any) => {
   toggleEditable(data)
-  const { field: { key }, value } = data
-  console.log(data)
-  emits('updateValue', { key, value });
+  const { field: { key }, value, item } = data
+  emits('updateValue', { key, value, id: item.id });
 };
 
+// selecteable functions
+
+const itemsSelected = ref<any[]>([])
+
+const itemSelected = (item: any) => {
+  console.log(Array.from(item))
+  itemsSelected.value = Array.from(item);
+}
 </script>
 
+<style>
+th {
+  text-align: center !important;
+}
+
+</style>

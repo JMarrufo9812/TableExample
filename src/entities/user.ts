@@ -4,3 +4,9 @@ export interface User {
     date: Date,
     status: boolean,
 }
+
+export interface UpdateUserValue {
+    id: number,
+    key: string,
+    value: any
+}
