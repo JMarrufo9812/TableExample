@@ -1,11 +1,23 @@
 <template>
-  <div class="app">
+  <b-container fluid class="app vh-100">
+    <b-row>
+      <b-col align-self="center">
+        <span class="title">
+          Generador de usuarios
+        </span>
+      </b-col>
+      <b-col class="d-flex justify-content-end my-4">
+        <b-button @click="generateUser(1)" variant="primary">
+          Añadir usuario
+        </b-button>
+      </b-col>
+    </b-row>
     <DataTable 
       :items="usersStore.users" 
       :headers="headers" 
       @updateValue="updateValue"
     />
-  </div>
+  </b-container>
 </template>
 
 <script setup lang="ts">
@@ -14,6 +26,7 @@ import DataTable from '@/components/DataTable.vue'
 import { useUsersStore } from '@/store/users'
 import { generateUsers  } from '@/utils'
 import { User, UpdateUserValue } from '@/entities/user.ts'
+import { BRow, BButton, BCol, BContainer } from 'bootstrap-vue'
 
 
 const usersStore = useUsersStore()
@@ -26,7 +39,6 @@ const headers = ref([
   { 
     label: '',
     key: 'selected',
-    class: 'align-center',
   },
   {
     label: 'Nombre',
@@ -48,18 +60,23 @@ const headers = ref([
   },
 ]);
 
-onMounted(() => {
-  generateUsers(10).forEach((user: User) => {
+function generateUser (quantity: number) {
+  generateUsers(quantity).forEach((user: User) => {
     usersStore.create(user)
   })
+}
+
+onMounted(() => {
+  generateUser(5)
 });
 </script>
 
 <style lang="scss">
-// @import "@/styles/variables.scss";
+@import "@/styles/text.scss";
+@import "@/styles/variables.scss";
 
-// .app {
-//   // background-color: $primary-color;
-//   // color: $secondary-color;
-// }
+.app {
+  background: $background
+}
+
 </style>
