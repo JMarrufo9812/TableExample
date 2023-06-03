@@ -97,7 +97,6 @@ const toggleEditable = (data: any) => {
 };
 
 const saveValue = (data: any) => {
-  console.log(data)
   const { field: { key }, value, item } = data
   emits('updateValue', { key, value, id: item.id });
   toggleEditable(data)
